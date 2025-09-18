@@ -32,7 +32,7 @@ Jedidja Mbinga 224016148
 
 Petrus Amukugo 224032119
 
-    1. I did the gRPC server skeleton and Protocol Buffers and server setup. 
+    1. I did the gRPC server skeleton,protocol buffers and server setup. 
     2. The rental proto with operations. 
     3. Generate Ballerina stubs.
 
