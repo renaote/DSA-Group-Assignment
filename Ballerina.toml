@@ -1,0 +1,7 @@
+[package]
+org = "ndina"
+name = "DSA_Group_Assignment"
+version = "0.1.0"
+
+[build-options]
+observabilityIncluded = true
