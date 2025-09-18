@@ -20,8 +20,8 @@ Atuhe Kambonde 224016172
 
 Ndina Unandapo 224062476
 
-   1.Implemented table database
-   2.Build REST endpoints for asset add/update/get/delete
+   1. Implemented table database
+   2. Build REST endpoints for asset add/update/get/delete
 
 Jedidja Mbinga 224016148
 
