@@ -36,4 +36,3 @@ Petrus Amukugo 224032119
     2. The rental proto with operations. 
     3. Generate Ballerina stubs.
 
-
