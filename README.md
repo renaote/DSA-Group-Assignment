@@ -36,3 +36,9 @@ Petrus Amukugo 224032119
     2. The rental proto with operations. 
     3. Generate Ballerina stubs.
 
+Bernard Fotolela 224065335
+
+    1.I implemented the gRPC Client & Reservation Logic
+    2.Implemented client that calls all RPCs.
+    3.Complete reservation logic (date checks, price calculation, availability overlap).
+
