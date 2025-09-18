@@ -16,6 +16,11 @@ Atuhe Kambonde 224016172
     3.I Implemented the  GET /assets/overdue with date comparison logic
 
 Ndina Unandapo 224062476
- 1.Implemented table database
- 2.Build REST endpoints for asset add/update/get/delete
+   1.Implemented table database
+   2.Build REST endpoints for asset add/update/get/delete
+
+Jedidja Mbinga 224016148
+    1. I did the REST Client Implementation
+    2. Wrote the Ballerina client that demonstrates all required API calls (CRUD, filter, overdue, component/schedule).
+    3. Provided test scripts (cURL/Postman optional).
 
