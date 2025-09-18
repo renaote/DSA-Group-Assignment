@@ -1,3 +1,4 @@
+import ballerina/time;
 public isolated class AssetDatabase {
 
     private final table<Asset> key(assetTag) assets = table [];
@@ -196,4 +197,21 @@ public isolated function getAssetCount() returns int {
             return updatedAsset;
         }
     }
+    
+    // Add this method to the AssetDatabase class for overdue maintenance schedules
+public isolated function getOverdueMaintenanceAssets() returns Asset[] {
+    time:Utc currentTime = time:utcNow();
+    Asset[] overdueAssets = []; // Define as a mutable array
+    
+    foreach var asset in self.assets {
+        foreach var schedule in asset.schedule {
+            // Check if the schedule has a due date and if it's overdue
+            if schedule.nextDueDate is time:Utc && time:utcToUnixSeconds(schedule.nextDueDate) < time:utcToUnixSeconds(currentTime) {
+                overdueAssets.push(asset);
+                break; // No need to check other schedules for this asset
+            }
+        }
+    }
+    return overdueAssets;
+}
 }
