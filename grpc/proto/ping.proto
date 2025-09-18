@@ -1,0 +1,10 @@
+// tiny grpc contract just to test toolchain
+syntax = "proto3";
+package demo;
+
+message Ping { string msg = 1; }
+message Pong { string msg = 1; }
+
+service Greeter {
+  rpc ping (Ping) returns (Pong);
+}
