@@ -4,53 +4,51 @@ public type AssetType "PRINTER"|"VEHICLE"|"ROUTER"|"COMPUTER"|"CAMERAS"|"AC"|"SE
 public type Status "ACTIVE"|"UNDER_REPAIR"|"DISPOSED";
 
 public type Components record {|
-string id;
-string name;
-string description;
-time:Date installedDate;
-Status status?;
+    string id;
+    string name;
+    string description;
+    time:Date installedDate;
+    Status status?;
 |};
 
 public type MaintenanceSchedule record {|
-string id;
-string scheduletype;
-string description;
-time:Date lastServiceDate;
-time:Date nextDueDate;
-boolean isOverDue?;
+    string id;
+    string scheduleType;
+    string description;
+    time:Date lastServiceDate;
+    time:Date nextDueDate;
+    boolean isOverDue?;
 |};
 
 public type Task record {|
-string id;
-string description;
-string status;
-time:Date assignedTo;
-time:Date dueDate;
-string completedDate?;
+    string id;
+    string description;
+    string status;
+    string? assignedTo;
+    time:Date dueDate;
+    time:Date? completedDate;
 |};
 
 public type WorkOrder record {|
-string id;
-string title;
-string description;
-time:Date openedDate;
-time:Date closedDate;
-string status;
-Task[] tasks;
-
-
+    string id;
+    string title;
+    string description;
+    time:Date openedDate;
+    time:Date closedDate;
+    string status;
+    Task[] tasks;
 |};
 
 public type Asset record {|
-readonly string assetTag;
-readonly string name;
-readonly string faculty;
-readonly string department;
-readonly Status status;
-readonly string acquiredDate;
-readonly Components[] components;
-readonly MaintenanceSchedule[] schedule;
-readonly WorkOrder[] workOrders;
+    readonly string assetTag;
+    readonly string name;
+    readonly string faculty;
+    readonly string department;
+    readonly Status status;
+    readonly string acquiredDate;
+    readonly Components[] components;
+    readonly MaintenanceSchedule[] schedule;
+    readonly WorkOrder[] workOrders;
 |};
 
 public type AssetInput record {|
@@ -60,7 +58,6 @@ public type AssetInput record {|
     string department;
     Status status;
     string acquiredDate;
-
 |};
 
 public type ComponentsInput record {|
@@ -80,8 +77,8 @@ public type MaintenanceScheduleInput record {|
 public type TaskInput record {|
     string description;
     string status;
-    string assignedTo?;
-    time:Date dueDate?;
+    string? assignedTo;
+    time:Date? dueDate;
 |};
 
 public type WorkOrderInput record {|
@@ -89,7 +86,6 @@ public type WorkOrderInput record {|
     string description;
     TaskInput[] tasks?;
 |};
-
 
 public type AssetUpdate record {|
     string assetTag;
@@ -128,7 +124,7 @@ public type TaskUpdate record {|
     string id; 
     string description?;
     string status?;
-    string assignedTo?;
-    time:Date dueDate?;
-    time:Date completedDate?;
+    string? assignedTo?;
+    time:Date? dueDate?;
+    time:Date? completedDate?;
 |};
