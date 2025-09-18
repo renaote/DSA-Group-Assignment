@@ -80,12 +80,15 @@ public isolated function getAssetCount() returns int {
      public isolated function assetExists(string assetTag) returns boolean {
         return self.assets.hasKey(assetTag);
     }
+    //Method to add a component to an asset
     public isolated function addComponent(string assetTag, Components component) returns Asset|error {
         lock {
+            //Checks if asset exists
             Asset? asset = self.assets[assetTag];
             if asset is () {
                 return error("Asset with tag '" + assetTag + "' not found");
             }
+            //Updates the asset record
             Components[] updatedComponents = asset.components.clone();
             updatedComponents.push(component);
             Asset updatedAsset = {
@@ -104,9 +107,10 @@ public isolated function getAssetCount() returns int {
             return updatedAsset;
         }
     }
-
+//Method to remove a component from an asset
     public isolated function removeComponent(string assetTag, string componentId) returns Asset|error {
         lock {
+            //Checks if asset exists
             Asset? asset = self.assets[assetTag];
             if asset is () {
                 return error("Asset with tag '" + assetTag + "' not found");
@@ -117,6 +121,7 @@ public isolated function getAssetCount() returns int {
                     updatedComponents.push(comp);
                 }
             }
+            //Updates the asset record
             Asset updatedAsset = {
                 assetTag: asset.assetTag,
                 name: asset.name,
@@ -134,8 +139,10 @@ public isolated function getAssetCount() returns int {
         }
     }
 
+//Method to add a maintenance schedule to an asset
     public isolated function addScheduleToAsset(string assetTag, MaintenanceSchedule scheduleItem) returns Asset|error {
         lock {
+            //Checks if asset exists
             Asset? asset = self.assets[assetTag];
             if asset is () {
                 return error("Asset with tag '" + assetTag + "' not found");
@@ -158,9 +165,10 @@ public isolated function getAssetCount() returns int {
             return updatedAsset;
         }
     }
-
+//Method to remove a maintenance schedule from an asset
     public isolated function removeScheduleFromAsset(string assetTag, string scheduleId) returns Asset|error {
         lock {
+            //Checks if asset exists
             Asset? asset = self.assets[assetTag];
             if asset is () {
                 return error("Asset with tag '" + assetTag + "' not found");
@@ -171,6 +179,7 @@ public isolated function getAssetCount() returns int {
                     updatedSchedule.push(sched);
                 }
             }
+            //Updates the asset record
             Asset updatedAsset = {
                 assetTag: asset.assetTag,
                 name: asset.name,
