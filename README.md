@@ -15,3 +15,7 @@ Atuhe Kambonde 224016172
     2.I Implemented the GET /assets for faculty.
     3.I Implemented the  GET /assets/overdue with date comparison logic
 
+Ndina Unandapo 224062476
+ 1.Implemented table database
+ 2.Build REST endpoints for asset add/update/get/delete
+
