@@ -1,8 +1,9 @@
-// mini REST sanity check
 import ballerina/http;
 
-service / on new http:Listener(8080) {
-    resource function get hi() returns string {
-        return "hello from rest";
+listener http:Listener ep = new (8080);
+
+service / on ep {
+    resource function get hello() returns json {
+        return { msg: "hello, REST! day 1" };
     }
 }
