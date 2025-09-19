@@ -198,20 +198,20 @@ public isolated function getAssetCount() returns int {
         }
     }
     
-  public isolated function getOverdueMaintenanceAssets() returns Asset[] {
-    lock {
-        time:Date currentDate = time:utcToCivil(time:utcNow());
-        Asset[] overdueAssets = [];
-        
-        foreach var asset in self.assets {
-            foreach var schedule in asset.schedule {
-                // Check if the schedule has a due date and if it's overdue
-                if schedule.nextDueDate is time:Date && schedule.nextDueDate < currentDate {
-                    overdueAssets.push(asset);
-                    break;
+    public isolated function getOverdueMaintenanceAssets() returns Asset[] {
+        lock {
+            time:Date currentDate = time:utcToCivil(time:utcNow());
+            Asset[] overdueAssets = [];
+            foreach var asset in self.assets {
+                foreach var sched in asset.schedule {
+                    time:Date dueDate = <time:Date>sched.nextDueDate;
+                    if <int>dueDate["utc"] < <int>currentDate["utc"] {
+                        overdueAssets.push(asset);
+                        break;
+                    }
                 }
             }
+            return overdueAssets;
         }
-        return overdueAssets;
     }
 }

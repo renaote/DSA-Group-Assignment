@@ -1,6 +1,6 @@
 import ballerina/http;
 
-listener http:Listener ep = new (8080);
+listener http:Listener ep = new (9090);
 
 service / on ep {
     resource function get hello() returns json {
