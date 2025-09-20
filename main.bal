@@ -140,13 +140,36 @@ service /api/assets on apiListener {
         return caller->respond(createSuccessResponse("Asset created successfully", <json>created, 201));
     }
 
-    // List assets
-    resource function get .(http:Caller caller) returns error? {
-        Asset[] all = assetDB.getAllAssets();
-        json data = { count: all.length(), assets: <json>all };
-        return caller->respond(createSuccessResponse("Assets retrieved successfully", data, 200));
+    // List assets and faculty filtering
+    resource function get .(http:Caller caller, http:Request req) returns error? {
+        string? facultyParam = req.getQueryParamValue("faculty");
+        
+        if facultyParam is string && facultyParam.trim().length() > 0{
+            Asset[] facultyAssets = assetDB.getAssetsByFaculty(facultyParam);
+            json data = {
+                count: facultyAssets.length(),
+                faculty: facultyParam,
+                assets: <json>facultyAssets
+            };
+            return caller->respond(createSuccessResponse("Assets filtered by faculty", data, 200));
+        } else {
+            Asset[] all = assetDB.getAllAssets();
+            json data = {count: all.length(), assets: <json>all};
+            return caller->respond(createSuccessResponse("Assets retrieved successfully", data, 200));
+        }
     }
 
+    //Get overdue maintenance assets - New Endpoint(Atuhe's responsibility but was missing)
+    resource function get overdue(http:Caller caller) returns error? {
+        Asset[] overdueAssets = assetDB.getOverdueMaintenanceAssets();
+        json data = {
+            count: overdueAssets.length(),
+            assets: <json>overdueAssets
+        };
+        return caller->respond(createSuccessResponse("Overdue assets retrieved succefully", data, 200));
+    
+    }
+    
     // Get one asset
     resource function get [string assetTag](http:Caller caller) returns error? {
         Asset|error a = assetDB.getAssetByTag(assetTag);
@@ -154,6 +177,120 @@ service /api/assets on apiListener {
             return caller->respond(createErrorResponse(a.message(), 404));
         }
         return caller->respond(createSuccessResponse("Asset retrieved successfully", <json>a, 200));
+    }
+
+    // Update asset - NEW ENDPOINT (Ndina's responsibility but was missing)
+    resource function put [string assetTag](http:Caller caller, http:Request req) returns error? {
+        json|error jp = req.getJsonPayload();
+        if jp is error {
+            return caller->respond(createErrorResponse("Invalid JSON: " + jp.message(), 400));
+        }
+        if !(jp is map<anydata>) {
+            return caller->respond(createErrorResponse("Update data must be a JSON object", 400));
+        }
+        map<anydata> m = <map<anydata>>jp;
+
+        // Create AssetUpdate record
+        AssetUpdate updateData = {
+            assetTag: assetTag,
+            name: m["name"] is string ? <string>m["name"] : (),
+            faculty: m["faculty"] is string ? <string>m["faculty"] : (),
+            department: m["department"] is string ? <string>m["department"] : (),
+            status: m["status"] is string ? check toStatus(<string>m["status"]) : (),
+            acquiredDate: m["acquiredDate"] is string ? <string>m["acquiredDate"] : ()
+        };
+
+        Asset|error updated = assetDB.updateAsset(assetTag, updateData);
+        if updated is error {
+            return caller->respond(createErrorResponse(updated.message(), 404));
+        }
+        return caller->respond(createSuccessResponse("Asset updated successfully", <json>updated, 200));
+    }
+
+    // Delete asset - NEW ENDPOINT (Ndina's responsibility but was missing)
+    resource function delete [string assetTag](http:Caller caller) returns error? {
+        error? result = assetDB.deleteAsset(assetTag);
+        if result is error {
+            return caller->respond(createErrorResponse(result.message(), 404));
+        }
+        return caller->respond(createSuccessResponse("Asset deleted successfully", (), 204));
+    }
+
+    // Add component to asset - NEW ENDPOINT (Ndati's responsibility but was missing)
+    resource function post [string assetTag]/components(http:Caller caller, http:Request req) returns error? {
+        json|error jp = req.getJsonPayload();
+        if jp is error {
+            return caller->respond(createErrorResponse("Invalid JSON: " + jp.message(), 400));
+        }
+        if !(jp is map<anydata>) {
+            return caller->respond(createErrorResponse("Component data must be a JSON object", 400));
+        }
+        map<anydata> m = <map<anydata>>jp;
+
+        // Generate component ID
+        string componentId = "COMP-" + (check assetDB.getAssetCount()).toString() + "-" + time:utcNow()[0].toString();
+        
+        Components component = {
+            id: componentId,
+            name: check readString(m, "name"),
+            description: check readString(m, "description", false),
+            installedDate: time:utcToCivil(time:utcNow())
+        };
+
+        Asset|error updated = assetDB.addComponent(assetTag, component);
+        if updated is error {
+            return caller->respond(createErrorResponse(updated.message(), 404));
+        }
+        return caller->respond(createSuccessResponse("Component added successfully", <json>component, 201));
+    }
+
+    // Remove component from asset - NEW ENDPOINT (Ndati's responsibility but was missing)
+    resource function delete [string assetTag]/components/[string componentId](http:Caller caller) returns error? {
+        Asset|error updated = assetDB.removeComponent(assetTag, componentId);
+        if updated is error {
+            return caller->respond(createErrorResponse(updated.message(), 404));
+        }
+        return caller->respond(createSuccessResponse("Component removed successfully", (), 204));
+    }
+
+    // Add schedule to asset - NEW ENDPOINT (Ndati's responsibility but was missing)
+    resource function post [string assetTag]/schedules(http:Caller caller, http:Request req) returns error? {
+        json|error jp = req.getJsonPayload();
+        if jp is error {
+            return caller->respond(createErrorResponse("Invalid JSON: " + jp.message(), 400));
+        }
+        if !(jp is map<anydata>) {
+            return caller->respond(createErrorResponse("Schedule data must be a JSON object", 400));
+        }
+        map<anydata> m = <map<anydata>>jp;
+
+        // Generate schedule ID
+        string scheduleId = "SCH-" + (check assetDB.getAssetCount()).toString() + "-" + time:utcNow()[0].toString();
+        
+        MaintenanceSchedule schedule = {
+            id: scheduleId,
+            scheduleType: check readString(m, "scheduleType"),
+            description: check readString(m, "description", false),
+            lastServiceDate: time:utcToCivil(time:utcNow()),
+            nextDueDate: m["nextDueDate"] is string ? 
+                time:utcToCivil(check time:utcFromString(<string>m["nextDueDate"] + "T00:00:00Z")) :
+                time:utcToCivil(time:utcNow())
+        };
+
+        Asset|error updated = assetDB.addScheduleToAsset(assetTag, schedule);
+        if updated is error {
+            return caller->respond(createErrorResponse(updated.message(), 404));
+        }
+        return caller->respond(createSuccessResponse("Schedule added successfully", <json>schedule, 201));
+    }
+
+    // Remove schedule from asset - NEW ENDPOINT (Ndati's responsibility but was missing)
+    resource function delete [string assetTag]/schedules/[string scheduleId](http:Caller caller) returns error? {
+        Asset|error updated = assetDB.removeScheduleFromAsset(assetTag, scheduleId);
+        if updated is error {
+            return caller->respond(createErrorResponse(updated.message(), 404));
+        }
+        return caller->respond(createSuccessResponse("Schedule removed successfully", (), 204));
     }
 
     // 1) Open a work order
@@ -350,6 +487,7 @@ service /api/assets on apiListener {
         return c->respond(createSuccessResponse("work orders", <json>asset.workOrders, 200));
     }
 }
+
 
 public function main() {
     log:printInfo("🚀 Server started on http://localhost:9090");
