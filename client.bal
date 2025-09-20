@@ -140,10 +140,10 @@ function createSampleAssets(http:Client client) returns error? {
         if response.statusCode == 201 {
             string tag = asset.assetTag.toString();
             string name = asset.name.toString();
-            io:println(string `✓ Created asset: ${tag} - ${name}`);
+            io:println(string ` Created asset: ${tag} - ${name}`);
         } else {
             string tag = asset.assetTag.toString();
-            io:println(string `✗ Failed to create asset ${tag}: ${response.statusCode}`);
+            io:println(string ` Failed to create asset ${tag}: ${response.statusCode}`);
         }
     }
 }
@@ -170,11 +170,11 @@ function updateAsset(http:Client client) returns error? {
     http:Response response = check client->put("/EQ-001", updatePayload);
     
     if response.statusCode == 200 {
-        io:println("✓ Asset EQ-001 updated successfully");
+        io:println(" Asset EQ-001 updated successfully");
         json payload = check response.getJsonPayload();
         io:println(payload.toString());
     } else {
-        io:println(string `✗ Failed to update asset: ${response.statusCode}`);
+        io:println(string ` Failed to update asset: ${response.statusCode}`);
     }
 }
 
@@ -204,9 +204,9 @@ function addComponentToAsset(http:Client client) returns error? {
     http:Response response = check client->post("/EQ-001/components", newComponent);
     
     if response.statusCode == 201 {
-        io:println("✓ Component added to asset EQ-001");
+        io:println(" Component added to asset EQ-001");
     } else {
-        io:println(string `✗ Failed to add component: ${response.statusCode} (endpoint likely not implemented)`);
+        io:println(string ` Failed to add component: ${response.statusCode} (endpoint likely not implemented)`);
     }
 }
 
@@ -222,9 +222,9 @@ function addScheduleToAsset(http:Client client) returns error? {
     http:Response response = check client->post("/EQ-001/schedules", newSchedule);
     
     if response.statusCode == 201 {
-        io:println("✓ Schedule added to asset EQ-001");
+        io:println(" Schedule added to asset EQ-001");
     } else {
-        io:println(string `✗ Failed to add schedule: ${response.statusCode} (endpoint likely not implemented)`);
+        io:println(string ` Failed to add schedule: ${response.statusCode} (endpoint likely not implemented)`);
     }
 }
 
@@ -245,9 +245,9 @@ function deleteAsset(http:Client client, string assetTag) returns error? {
     http:Response response = check client->delete(string `/${assetTag}`);
     
     if response.statusCode == 204 || response.statusCode == 200 {
-        io:println(string `✓ Asset ${assetTag} deleted successfully`);
+        io:println(string ` Asset ${assetTag} deleted successfully`);
     } else {
-        io:println(string `✗ Failed to delete asset ${assetTag}: ${response.statusCode}`);
+        io:println(string ` Failed to delete asset ${assetTag}: ${response.statusCode}`);
     }
 }
 
@@ -281,9 +281,9 @@ function removeComponentFromAsset(http:Client client, string assetTag, string co
     http:Response response = check client->delete(string `/assets/${assetTag}/components/${componentId}`);
     
     if response.statusCode == 204 || response.statusCode == 200 {
-        io:println(string `✓ Component ${componentId} removed from asset ${assetTag}`);
+        io:println(string ` Component ${componentId} removed from asset ${assetTag}`);
     } else {
-        io:println(string `✗ Failed to remove component: ${response.statusCode}`);
+        io:println(string ` Failed to remove component: ${response.statusCode}`);
     }
 }
 
@@ -291,9 +291,9 @@ function removeScheduleFromAsset(http:Client client, string assetTag, string sch
     http:Response response = check client->delete(string `/${assetTag}/schedules/${scheduleId}`);
     
     if response.statusCode == 204 || response.statusCode == 200 {
-        io:println(string `✓ Schedule ${scheduleId} removed from asset ${assetTag}`);
+        io:println(string ` Schedule ${scheduleId} removed from asset ${assetTag}`);
     } else {
-        io:println(string `✗ Failed to remove schedule: ${response.statusCode}`);
+        io:println(string ` Failed to remove schedule: ${response.statusCode}`);
     }
 }
 
@@ -307,7 +307,7 @@ function demonstrateWorkOrders(http:Client client) returns error? {
     http:Response response = check client->post("/EQ-001/workorders", workOrderPayload);
     
     if response.statusCode == 201 {
-        io:println("✓ Work order opened for asset EQ-001");
+        io:println(" Work order opened for asset EQ-001");
         json payload = check response.getJsonPayload();
         
         // Extract work order ID from response
@@ -322,9 +322,9 @@ function demonstrateWorkOrders(http:Client client) returns error? {
                 
                 http:Response taskResponse = check client->post(string `/EQ-001/workorders/${woId}/tasks`, taskPayload);
                 if taskResponse.statusCode == 201 {
-                    io:println("✓ Task added to work order");
+                    io:println(" Task added to work order");
                 } else {
-                    io:println(string `✗ Failed to add task: ${taskResponse.statusCode}`);
+                    io:println(string ` Failed to add task: ${taskResponse.statusCode}`);
                 }
                 
                 // 3. Update work order status
@@ -334,21 +334,21 @@ function demonstrateWorkOrders(http:Client client) returns error? {
                 
                 http:Response updateResponse = check client->put(string `/EQ-001/workorders/${woId}`, updatePayload);
                 if updateResponse.statusCode == 200 {
-                    io:println("✓ Work order status updated");
+                    io:println(" Work order status updated");
                 } else {
-                    io:println(string `✗ Failed to update work order: ${updateResponse.statusCode}`);
+                    io:println(string ` Failed to update work order: ${updateResponse.statusCode}`);
                 }
                 
                 // 4. Close the work order
                 http:Response closeResponse = check client->post(string `/EQ-001/workorders/${woId}/close`);
                 if closeResponse.statusCode == 200 {
-                    io:println("✓ Work order closed");
+                    io:println(" Work order closed");
                 } else {
-                    io:println(string `✗ Failed to close work order: ${closeResponse.statusCode}`);
+                    io:println(string ` Failed to close work order: ${closeResponse.statusCode}`);
                 }
             }
         }
     } else {
-        io:println(string `✗ Failed to open work order: ${response.statusCode}`);
+        io:println(string ` Failed to open work order: ${response.statusCode}`);
     }
 }
